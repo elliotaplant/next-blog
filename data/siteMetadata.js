@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Elliot Plant\'s Blog',
+  title: "Elliot Plant's Blog",
   author: 'Elliot Plant',
   headerTitle: 'Elliot Plant',
   description: 'By Elliot, for the curious',
@@ -83,6 +83,6 @@ const siteMetadata = {
   //   //   indexName: 'docsearch',
   //   // },
   // },
-}
+};
 
-module.exports = siteMetadata
+module.exports = siteMetadata;
