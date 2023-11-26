@@ -3,7 +3,7 @@ const siteMetadata = {
   title: "Elliot Plant's Blog",
   author: 'Elliot Plant',
   headerTitle: 'Elliot Plant',
-  description: 'by Elliot, for the curious',
+  description: 'by Elliot, for you',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://elliotplant.com',

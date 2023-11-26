@@ -1,19 +1,16 @@
 const projectsData = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: 'Turn Ethereum Addresses into Etherscan Links in iTerm2',
+    description: `Tired of copying and pasting eth addresses into etherscan's search from your terminal? Try
+  turning each address and transaction hash into a link straight to etherscan.`,
+    imgSrc: '/static/images/etherscan-iterm.png',
+    href: 'https://medium.com/@elliotaplant/turn-ethereum-addresses-into-etherscan-links-in-iterm2-77656dc48fde',
   },
   {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'Abra.js',
+    description: `Abra is an incredibly small and simple sort-of-react-like JS "framework". Definitely not production ready.`,
+    imgSrc: '/static/images/abra.png',
+    href: 'https://medium.com/@elliotaplant/abra-js-1c1e51f186c2',
   },
 ];
 
