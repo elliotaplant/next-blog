@@ -1,0 +1,83 @@
+---
+title: 'Celestial Dance'
+date: '2016-05-20'
+lastmod: '2016-06-06'
+tags: ['software', 'vr', 'javascript']
+draft: false
+summary:
+  'Celestial Dancers is an orbital mechanics simulation I made using React and A-Frame VR. The
+  simulation is built for virtual reality browsers, so it is best viewed with google cardboard and a
+  smart phone. It still works on desktop, and with the keyboard you can fly through space and use
+  your mouse to look around.'
+images: ['/static/images/celestial.png']
+---
+
+Edit (June 6, 2016): In light of the recent passing of Dr. Klug at UCLA, this project is a
+dedication to him, his amazing work as a teacher, and the family he talked about so frequently and
+loved so clearly. Dr. Klug taught me dynamics, engineering programming, and finite element analysis,
+all of which were utilized in this project and essential to my development as an engineer. I
+couldn't have asked for a better professor, and my heart goes out to friends and family he leaves
+behind.
+
+# Orbital Mechanics Simulation
+
+Celestial Dancers is an orbital mechanics simulation I made using React and A-Frame VR. The
+simulation is built for virtual reality browsers, so it's best viewed with google cardboard and a
+smart phone. It still works on desktop, and with the keyboard you can fly through space and use your
+mouse to look around. [Try it live](https://elliotplant.com/celestial-dance/) or
+[take a look at the code](https://github.com/elliotaplant/celestial-dance).
+
+![The view from your headset](/static/images/celestial.png) _The view from your headset_
+
+I built the physics engine for this project entirely in JavaScript. The engine incorporates
+gravitational forces and collisions with custom React components, and updates itself with A-Frame's
+component lifecycle events.
+
+I maintained the interactions between each pair of bodies, adding new interactions as new bodies
+entered the scene. On every cycle, each interaction would calculate the distance between its two
+bodies, use Newton's law of universal gravitation to calculate a gravity force, and use Hooke's law
+to calculate a collision force. Roughly 10 times per second, the sum of the collision and gravity
+forces would update the acceleration, velocity, and finally position of each body.
+
+# Challenges
+
+I ran into an interesting technical challenge related to the update cycle of the simulation and the
+order of the force calculation and position update. When I first built the simulation, I iterated
+over each body to calculate its interaction with each other body, and then I would move it
+accordingly before beginning the calculations for the next body. My process looked like:
+
+```{r, eval = FALSE}
+on each update cycle of the simulation
+   for each body in the simulation
+      calculate the forces due to all the other bodies in the simulation
+      sum those forces
+      update the current body's acceleration from that sum
+      update the current body's velocity from that acceleration
+      update the current body's position from that velocity
+   end
+end
+```
+
+I realized that because I updated the position of body A before calculating the forces on body B,
+the force from A to B would be slightly different than the force from B to A. This worked just fine
+when bodies were far apart, but if they got too close to one another, their interactions became
+erratic. Bodies would approach one another and then rapidly fly off into the distance.
+
+To solve this problem, I rearranged the calculation and update steps so that all of the forces were
+calculated before any of the positions were updated:
+
+```{r, eval = FALSE}
+on each update cycle of the simulation
+   for each interaction in the simulation
+      calculate the force between the interaction's two bodies
+   end
+   for each interaction in the simulation
+      update the simulation's bodies' accelerations
+      update the simulation's bodies' velocities from those accelerations
+      update the simulation's bodies' positions from those velocities
+   end
+end
+```
+
+This update pattern solved the problem perfectly because all of the forces for a given update cycle
+were calculated using the same state.
