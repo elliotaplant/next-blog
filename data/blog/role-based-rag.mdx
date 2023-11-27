@@ -1,0 +1,26 @@
+---
+title: 'Role Based Rag'
+date: '2021-10-15'
+lastmod: '2021-10-15'
+tags: ['software', 'ai']
+draft: false
+summary:
+  'A demonstration of the implementation of role-based access control (RBAC) in a LLM vector
+  database. The application manages access to the nodes of the vector database by attaching an
+  allowlist of roles to the metadata of each node. This enables nodes to have an unlimited number of
+  allowed roles. If the application were extended to use "real" data sources, those roles could be
+  sourced from the data source API, such as the Google Drive API.'
+images: ['/static/images/profile.png']
+---
+
+A demonstration of the implementation of role-based access control (RBAC) in a LLM vector database.
+The application manages access to the nodes of the vector database by attaching an allowlist of
+roles to the metadata of each node. This enables nodes to have an unlimited number of allowed roles.
+If the application were extended to use "real" data sources, those roles could be sourced from the
+data source API, such as the Google Drive API.
+[Check out the code](https://github.com/elliotaplant/role-based-rag).
+
+# Why did I make it?
+
+This project was for an interview with a very interesting AI security company. I enjoyed navigating
+the novel difficulties of LLMs and security.
