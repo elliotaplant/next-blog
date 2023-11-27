@@ -1,0 +1,27 @@
+---
+title: 'Dice Prediction with Neural Networks'
+date: '2021-10-03'
+lastmod: '2021-10-03'
+tags: ['software', 'ai', 'python']
+draft: false
+summary:
+  'This project involves training a neural network to predict the outcome of dice rolls. Two loss
+  functions are explored for the prediction task: one-hot categorical crossentropy and a custom
+  distribution-based loss. The neural network is designed using TensorFlow and Keras. '
+images: ['/static/images/profile.png']
+---
+
+This project involves training a neural network to predict the outcome of dice rolls. Two loss
+functions are explored for the prediction task: one-hot categorical crossentropy and a custom
+distribution-based loss. The neural network is designed using TensorFlow and Keras.
+[Check out the code](https://github.com/elliotaplant/dice-predictions).
+
+# Why did I make it?
+
+I've always been curious about training Neural Nets, and I wanted to understand the relationship
+between a loss function and the accuracy of the network. I originally hypothesized that a loss
+function that calculated the aggregate loss across an entire training set would be train faster and
+more accurately. It turned out I had a lot of reading to do about the importance of
+differentiability of the loss function. Ultimately, a 1 hot encoding of the dice roll and a
+crossentropy loss function worked just fine for predicting the probability of rolling numbers on a
+dice.
