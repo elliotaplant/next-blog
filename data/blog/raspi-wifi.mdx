@@ -1,0 +1,26 @@
+---
+title: 'RaspiWiFi'
+date: '2021-07-30'
+lastmod: '2021-07-30'
+tags: ['software', 'raspberry pi', 'python', 'surf poster']
+draft: false
+summary:
+  "RaspiWiFi is a program to headlessly configure a Raspberry Pi's WiFi connection using using any
+  other WiFi-enabled device, much like the way a Chromecast or or smart speaker."
+images: ['/static/images/profile.png']
+---
+
+RaspiWiFi is a program to headlessly configure a Raspberry Pi's WiFi connection using using any
+other WiFi-enabled device, much like the way a Chromecast or or smart speaker.
+[Check out the code](https://github.com/elliotaplant/RaspiWiFi).
+
+# Why did I make it?
+
+When building my surf posters, I knew I would need a way for eventual buyers to be able to set up
+the WiFi on their posters by themselves. I started by hard-coding the WiFI credentials into the
+Raspberry Pi's memory card, but that stopped working as soon as a friend I had given one to decided
+to move.
+
+I wanted a smooth login experience, and I found that [jasbur](https://github.com/jasbur/RaspiWiFi)
+had made something that was _almost_ exactly what I was looking for. I wanted to change the style on
+the HTML configuration page, so I forked the repo and adjusted the code.
