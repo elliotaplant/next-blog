@@ -1,0 +1,27 @@
+---
+title: 'WebGoCat'
+date: '2020-06-05'
+lastmod: '2020-06-05'
+tags: ['software', 'golang']
+draft: false
+summary: 'A command line WebSocket interface with no Node dependency and SSL built in.'
+images: ['/static/images/profile.png']
+---
+
+# What does it do?
+
+`webgocat` is a WebSocket client for the command line. It lets you connect to a WebSocket to send
+and receive text messages. Check out the
+[single file of code](https://github.com/elliotaplant/webgocat).
+
+# Why?
+
+I love the tool [wscat](https://github.com/websockets/wscat) and have used it for a long time, but I
+work on machines that don't have Node/NPM installed. Because `wscat` is installed via NPM and run on
+Node, it isn't an option for those projects.
+
+I tried using `websocat`, but the binaries don't come with SSL built in so I couldn't connect to wss
+endpoints. One could probably add SSL when compiling from the source, but that seemed onerous.
+
+Go lets you compile a binary for almost any target, so I thought that use Go would be a great tool
+to make a WebSocket client without requiring any other dependencies on the host.
