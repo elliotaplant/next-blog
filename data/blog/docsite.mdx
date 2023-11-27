@@ -1,0 +1,44 @@
+---
+title: 'DocSite'
+date: '2023-04-22'
+lastmod: '2023-09-02'
+tags: ['learning']
+draft: false
+summary: 'Turn your Google Docs into Websites'
+images: ['/static/images/profile.png']
+---
+
+DocSite is a tool I built that turns Google Docs or Google Drive folders into web pages and web
+sites.
+
+# Why did I make it?
+
+I have a friend who writes a lot, but only likes to write in MS Word. No twitter, no markdown, no
+blogging platforms. DocSite was an attempt to make it easy for him to host a website of his own
+instead of email his friends `.docx` files.
+
+# How does it work?
+
+Once you've created an account and granted DocSite access to your Google Drive, you can select any
+file or folder you'd like to turn into a website. DocSite's servers (currently hosted on
+Cloudflare):
+
+- Download your doc as HTML
+- Extracts images to store in a file bucket
+- Add a bit of code to make the HTML mobile friendly
+- Edit the links to remove Google's tracking parameters
+- Stores the modified HTML to a static file bucket on cloudflare.
+
+If you select a Drive folder instead of a Doc, then the servers recursively navigate through your
+folder tree and publish all of the docs nested in that folder.
+
+# How did I get custom subdomain DNS working?
+
+Cloudflare has a cool DNS feature that let's you
+[host wildcard DNS records](https://developers.cloudflare.com/dns/manage-dns-records/reference/wildcard-dns-records/).
+This let me utilize the subdomain at request time to serve the appropriate HTML file.
+
+# Want to try it?
+
+I would love if someone else tried it. I think DocSite is really cool, and I'm eager to help someone
+get online with it.
