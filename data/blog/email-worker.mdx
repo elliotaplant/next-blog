@@ -1,0 +1,50 @@
+---
+title: 'Recieve Emails with Code'
+date: '2023-12-08'
+lastmod: '2023-12-08'
+tags: ['software', 'tools', 'javascript', 'cloudflare', 'email', 'dns']
+draft: false
+summary: 'How to easily receive receive emails in a cloudflare worker'
+images: ['/static/images/profile.png']
+---
+
+I was messing around with my email settings when I found that you can use Cloudflare to route emails
+on any of your domains hosted there. That means that I can set up
+[me@elliotplant.com](mailto:me@elliotplant.com) to go directly to my gmail inbox.
+
+And in the same docs where I figured out how to do that, I found that you can
+[handle emails with workers](https://developers.cloudflare.com/email-routing/). I've always expected
+application flows that _start_ with an inbound email to be really hard to do. Once again, Cloudflare
+makes it super easy.
+
+# How do you do it?
+
+Setting up a worker to recieve emails is as simple as:
+
+- Log in to the Cloudflare dashboard and select your account and the domain you want to receive
+  emails on.
+- Go to Email > Email Routing > Email Workers.
+- Select "Get started"
+- Give it a good name (this isn't necessarily the email address that recieves the email)
+- Select any starter. If you want to use the **body** of the email, try this, and note that the
+  contents will have a lot more than what appears in your gmail inbox:
+
+```js
+export default {
+  async email(message, env, ctx) {
+    console.log('from', message.from);
+    console.log('to', message.to);
+    const stringContents = await new Response(message.raw).text();
+    console.log('stringContents', stringContents);
+  },
+};
+```
+
+- Hit "Save and deploy"
+- Finally, hit "Create route" to add an email address on your domain to trigger the worker.
+
+# This body is useless. Can I just get the body of the email as text?
+
+If you want to interpret your body in a cleaner way, try using a tool like
+[MailParser](https://www.npmjs.com/package/mailparser). You can get the `text()` or `html()` of the
+email pretty simply that way.
