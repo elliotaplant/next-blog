@@ -1,0 +1,45 @@
+---
+title: 'Doodle Clone'
+date: '2025-01-06'
+lastmod: '2025-01-06'
+tags: ['software', 'tools', 'javascript', 'cloudflare', 'scheduling']
+draft: false
+summary: 'A scheduling poll application built with Cloudflare Workers that lets you create polls with multiple date/time options and collect availability votes'
+images: ['/static/images/profile.png']
+---
+
+# Doodle Clone
+
+I built a scheduling poll application inspired by Doodle using Cloudflare Workers. You can try it out at [doodle.elliotplant.com](https://doodle.elliotplant.com) or check out the [source code](https://github.com/elliotaplant/doodle).
+
+# Why did I build this?
+
+Coordinating meetings with multiple people is always a pain. You either send around a bunch of "what about Tuesday?" messages or create a complex spreadsheet that nobody wants to fill out. Doodle solved this problem elegantly, but I wanted to understand how to build something similar and experiment with Cloudflare Workers' capabilities.
+
+# What does it do?
+
+The app lets you create scheduling polls with multiple date and time options using an interactive calendar. Participants can then vote Yes/Maybe/No for each time slot, and you get real-time results showing vote counts and participant names.
+
+Key features include:
+- Interactive poll creation with calendar interface
+- Simple Yes/Maybe/No voting for each time slot
+- Real-time results showing all votes
+- Clean responsive UI that works on desktop and mobile
+- No database required - uses Cloudflare Workers with in-memory storage
+
+# How did I build it?
+
+The entire application runs on Cloudflare Workers using a modern tech stack:
+
+- **Hono** - Lightweight web framework for the API
+- **chanfana** - OpenAPI 3.1 integration for automatic API documentation
+- **Zod** - Schema validation for type safety
+- **TypeScript** - End-to-end type safety
+
+The architecture is surprisingly simple. Poll data is stored in Cloudflare's key-value storage, and the UI is server-rendered HTML with vanilla JavaScript for interactivity. No complex frontend framework needed.
+
+# What's next?
+
+This was a great experiment in building with Cloudflare Workers. The serverless model makes deployment incredibly simple, and the global edge network means the app is fast anywhere in the world.
+
+I might add features like email notifications when polls are created or voted on, or integration with calendar applications to automatically schedule the winning time slot.
