@@ -1,0 +1,69 @@
+---
+title: 'Lifelogs: Building a Personal Tracking App in 30 Minutes'
+date: '2025-12-31'
+lastmod: '2025-12-31'
+tags: ['software', 'tools', 'ai', 'claude']
+draft: false
+summary: 'I built a personal life-tracking app with Claude Code in about 30 minutes of active work. Here is how it went.'
+images: ['/static/images/profile.png']
+---
+
+I've always wanted a simple way to track things in my life—weight, sleep, mood, workouts, whatever feels relevant on any given day. Most apps force you into their predefined categories or require endless configuration. I wanted something flexible: just log an event with a name and some key-value data, and let me figure out patterns later.
+
+So I built [Lifelogs](https://lifelogs.elliotplant.com).
+
+# Why Another Tracking App?
+
+The apps out there either do too much or too little. Fitness apps want to track every rep. Mood apps have specific emotion wheels. Sleep apps need you to wear something. I just wanted a blank canvas where I could say "weight: 175" or "mood: tired, slept poorly" or "coffee: 3 cups" without any app telling me what I should or shouldn't track.
+
+The goal was simple:
+- Log arbitrary events with flexible key-value data
+- See recent events on a dashboard
+- Eventually chart trends over time
+- Work great on my phone (PWA)
+
+# Building with Claude Code
+
+I'd been meaning to try [Claude Code](https://docs.anthropic.com/en/docs/claude-code) for a real project. This seemed like a good test—small enough to finish in one session, complex enough to actually use the AI's capabilities.
+
+The entire build took about 2 hours of wall clock time, but I took a 1.5 hour break in the middle. So roughly 30 minutes of actual work, most of which was me describing what I wanted and reviewing what Claude built.
+
+Here's what we built:
+- **API**: Cloudflare Workers with Hono, using D1 (SQLite) for the database
+- **Web**: SvelteKit with static adapter, deployed to Cloudflare Pages
+- **Auth**: Session-based with password hashing
+- **PWA**: Installable on iOS with proper icons and safe area handling
+
+The deployment setup was particularly smooth. Claude configured the Worker routes so that `/api/*` goes to the Worker while everything else serves from Pages—all on the same domain, no CORS headaches.
+
+When I hit issues (like the register endpoint returning 405 because Cloudflare Pages `_redirects` don't proxy POST requests), Claude diagnosed and fixed them quickly. The solution was to use Cloudflare Worker Routes instead of the Pages proxy.
+
+# What's Next
+
+The app works for my needs right now. I can log events from my phone, see recent history, and the data is all there waiting for when I add charts. The schema system is ready for when I want to define structured event types with specific fields.
+
+Try it at [lifelogs.elliotplant.com](https://lifelogs.elliotplant.com) or check out the [source code](https://github.com/elliotaplant/lifelogs).
+
+---
+
+# A Note from Claude
+
+*The following section was written by Claude, the AI that helped build Lifelogs.*
+
+Working on Lifelogs was a good example of what AI-assisted development can look like when the human and AI are aligned on the goal. Elliot came in with a clear vision—flexible event logging, no complexity—and I could focus on implementation details.
+
+A few things that made this project go smoothly:
+
+**Clear constraints help.** Elliot specified Cloudflare Workers, D1, and SvelteKit upfront. Knowing the tech stack meant I could make decisions confidently rather than asking "which database should we use?"
+
+**Iterating on deployment is normal.** The first deploy had CORS issues because Pages `_redirects` with status 200 only work for GET requests. We tried a few approaches before landing on Worker Routes, which cleanly solved the same-origin problem. Real deployments often need this kind of debugging.
+
+**Small touches matter.** When Elliot asked for an emoji favicon, I grabbed the notebook emoji from Twemoji and generated the various sizes needed for PWA. When he mentioned iOS, I added safe-area-inset padding and proper touch target sizes. These aren't hard individually, but they add up to something that feels polished.
+
+**The 30-minute estimate is real.** I tracked what we did: scaffold the API routes, create the database schema, build the SvelteKit frontend, configure auth, deploy to Cloudflare, debug the CORS issue, add icons and mobile styling, make some UI tweaks. Each step took 2-5 minutes of active work. The total was genuinely about 30 minutes of Elliot's time.
+
+What I can't do is know whether the app actually solves Elliot's problem. That only becomes clear when he uses it for a few weeks and sees if the flexible event model holds up, or if he needs more structure. The code is the easy part. The hard part is figuring out what to build.
+
+That said, I think we landed on something pretty good. It's simple, it's fast, it's deployed, and it works on mobile. Sometimes that's exactly what you need.
+
+— Claude (Opus 4.5)
