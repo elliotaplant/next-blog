@@ -1,0 +1,200 @@
+---
+title: 'Understanding the Fourier Transform Through Tides'
+date: '2024-12-30'
+tags: ['math', 'signal-processing', 'python']
+draft: false
+summary: 'Using 20 years of San Francisco tide data to explore Fourier analysis and discover celestial mechanics hidden in water level measurements.'
+images: ['/static/images/fourier-tides/spectrum_labeled.png']
+---
+
+The Fourier transform takes a signal that changes over time and reveals which frequencies are hiding inside it. If you haven't encountered it before, [3Blue1Brown's visual explanation](https://www.youtube.com/watch?v=spUNpyF58BY) is the best introduction I know of.
+
+Any repeating signal, no matter how complicated, can be built by adding together simple sine waves of different frequencies. A tide chart, a heartbeat, a musical chord. Each is just a sum of pure oscillations. The Fourier transform works in reverse. Given a messy signal, it tells you which sine waves were added together to create it, and how strong each one is.
+
+We've known for centuries, thanks to astronomy, exactly which frequencies *should* appear in the tides. This makes tide data a perfect test case. We can check whether our Fourier analysis actually works by seeing if the expected peaks show up.
+
+## Tides and Their Causes
+
+People have been predicting tides for millennia. Water rises and falls roughly twice a day, and the heights vary with the phases of the Moon. But the details get complicated fast.
+
+Tides come from the gravitational pull of the Moon and Sun. As the Earth rotates, different parts of the surface move through regions of higher and lower gravitational pull, and the water sloshes back and forth. The important thing is that these gravitational influences have very specific periods.
+
+### Major Tidal Constituents
+
+| Period | Name | Cause |
+|--------|------|-------|
+| 12.42 hours | M2 | Earth rotating under the Moon's tidal bulge |
+| 12.00 hours | S2 | Earth rotating under the Sun's tidal bulge |
+| 12.66 hours | N2 | Moon's elliptical orbit (perigee vs apogee) |
+| 23.93 hours | K1 | Moon and Sun's declination (tilt relative to equator) |
+| 25.82 hours | O1 | Moon's changing declination |
+| 24.07 hours | P1 | Sun's changing declination |
+| ~14 days | Mf | Moon and Sun coming into/out of alignment |
+| ~6 months | Ssa | Solar semi-annual |
+| ~1 year | Sa | Seasonal changes |
+
+The naming convention (M2, S2, K1, etc.) comes from 19th-century tidal analysis. "M" means lunar (Moon), "S" means solar (Sun), and the number indicates roughly how many cycles occur per day.
+
+If the Fourier transform works, we should see peaks at exactly these periods.
+
+## Getting the Data
+
+NOAA maintains tide gauges across the US coast and provides free historical data through their API. I pulled 20 years of hourly water level measurements from San Francisco (2004-2023), which comes out to about 175,000 data points.
+
+Here's what a few days of tide data looks like:
+
+![3 days of tide data](/static/images/fourier-tides/time_series_3days.png)
+
+You can see the roughly twice-daily pattern, with the two daily high tides often having different heights (that's the "diurnal inequality" caused by K1 and O1).
+
+Zooming out to a month:
+
+![1 month of tide data](/static/images/fourier-tides/time_series_1month.png)
+
+Now a longer pattern emerges. The tidal range varies over about a two-week cycle. These are "spring tides" (large range, when Moon and Sun align) and "neap tides" (small range, when they're at right angles).
+
+## A First Attempt at the Fourier Transform
+
+The Fourier transform takes our sequence of water heights and outputs an "amplitude" for each possible frequency. High amplitude means that frequency is strongly present in the signal.
+
+Here's the power spectrum (amplitude squared) of our tide data:
+
+![Unlabeled spectrum](/static/images/fourier-tides/spectrum_unlabeled.png)
+
+There are clear peaks jumping out of the noise. Let's see if they match our predictions.
+
+## The Hann Window
+
+There's a subtlety when computing the Fourier transform of real data. The FFT assumes your signal repeats forever, with the end wrapping around to the beginning. But our tide data doesn't line up neatly. The water level at the end of our 20-year chunk has no reason to match the level at the beginning, so there's a discontinuity where the signal "jumps" when it wraps around.
+
+This discontinuity creates problems. Sharp jumps require high frequencies to represent, so the FFT sees frequencies that aren't really in the data. Energy from the true peaks spreads into neighboring frequencies. This is called "spectral leakage."
+
+The solution is to multiply our signal by a smoother window function before computing the FFT. The Hann window (named after Julius von Hann) tapers gradually to zero at both ends.
+
+This smooth tapering has a much cleaner frequency response, and the ripples are greatly reduced.
+
+![Windowing comparison](/static/images/fourier-tides/windowing.png)
+
+The top panel shows the spectrum computed without windowing. Notice the elevated "skirt" around each peak where energy has leaked into neighboring frequencies. The bottom panel applies the Hann window first, and the peaks are sharper with a lower noise floor between them.
+
+Windowing doesn't change *where* the peaks are. The frequencies are still correct. It just makes them easier to see and measure accurately.
+
+## Matching Peaks to Physics
+
+Now let's look at the full spectrum with our expected tidal constituents labeled:
+
+![Labeled spectrum](/static/images/fourier-tides/spectrum_labeled.png)
+
+Every major peak corresponds to a known gravitational effect. There are also many smaller peaks, so let's zoom in.
+
+### Semidiurnal Region (11-14 hours)
+
+![Semidiurnal zoom](/static/images/fourier-tides/spectrum_semidiurnal.png)
+
+Besides the big three (M2, S2, N2), we can see numerous minor constituents:
+
+| Period | Name | Cause |
+|--------|------|-------|
+| 11.61h | 2SM2 | Shallow water compound (interaction of S2 and M2) |
+| 11.97h | K2 | Lunisolar declination effects |
+| 12.02h | T2 | Solar elliptic variation |
+| 12.19h | L2 | Lunar elliptic (variation in Moon's angular speed) |
+| 12.22h | λ2 | Secondary lunar elliptic term |
+| 12.63h | ν2 | Evection (Sun's perturbation of Moon's orbit) |
+| 12.87h | μ2 | Variational (Moon's speed variation near new/full moon) |
+| 12.91h | 2N2 | Second-order elliptic effect |
+| 13.13h | MNS2 | Shallow water compound tide |
+| 13.39h | 2MS2 | Shallow water compound tide |
+
+### Diurnal Region (22-28 hours)
+
+![Diurnal zoom](/static/images/fourier-tides/spectrum_diurnal.png)
+
+| Period | Name | Cause |
+|--------|------|-------|
+| 22.31h | OO1 | Second-order lunar diurnal |
+| 23.10h | J1 | Smaller lunar elliptic |
+| 24.84h | M1 | Smaller lunar diurnal |
+| 26.72h | ρ1 | Larger lunar evectional |
+| 26.87h | Q1 | Larger lunar elliptic |
+| 27.85h | σ1 | Lunar diurnal |
+| 28.01h | 2Q1 | Second-order elliptic |
+
+### Long-Period Signals (days to years)
+
+With 20 years of data, we can also detect very low-frequency signals:
+
+![Long period](/static/images/fourier-tides/spectrum_long_period.png)
+
+| Period | Name | Cause |
+|--------|------|-------|
+| ~14 days | Mf | Lunar fortnightly (spring-neap cycle) |
+| ~6 months | Ssa | Solar semi-annual |
+| ~1 year | Sa | Annual/seasonal cycle |
+
+The annual signal includes both gravitational effects and meteorological factors (barometric pressure, wind patterns, river discharge).
+
+## Why This Matters
+
+The tidal example demonstrates several key concepts:
+
+1. **The Fourier transform reveals hidden periodicity.** The raw tide signal looks complex, but it's actually a sum of pure sinusoids at specific frequencies.
+
+2. **Windowing reduces spectral leakage.** Multiplying by a smooth window before the FFT gives cleaner results.
+
+3. **The physics determines the frequencies.** Each peak in the spectrum corresponds to a real gravitational phenomenon.
+
+---
+
+## Appendix: Complete Constituent Reference
+
+### Semidiurnal Constituents (~12 hours)
+
+These arise from the Earth rotating under the gravitational bulge twice per day.
+
+| Name | Period | Description | Physical Mechanism |
+|------|--------|-------------|-------------------|
+| **M2** | 12.42h | Principal lunar semidiurnal | The dominant tidal constituent. As Earth rotates, a point passes through the Moon's tidal bulge twice per lunar day (24h 50m). Half of that is 12.42h. |
+| **S2** | 12.00h | Principal solar semidiurnal | Same mechanism as M2, but caused by the Sun. Period is exactly 12h because the solar day is exactly 24h by definition. |
+| **N2** | 12.66h | Larger lunar elliptic | The Moon's orbit is elliptical. At perigee (closest), gravitational pull is ~15% stronger than at apogee. This modulates M2 at the anomalistic month (27.55 days). |
+| **K2** | 11.97h | Lunisolar semidiurnal | Combined effect of lunar and solar declination changes on the semidiurnal tide. |
+| **L2** | 12.19h | Smaller lunar elliptic | Arises from variation in the Moon's angular velocity as it moves through its elliptical orbit. |
+| **T2** | 12.02h | Larger solar elliptic | Earth's orbital eccentricity causes the Sun's tidal force to vary over the year. |
+| **2N2** | 12.91h | Lunar elliptic second order | Second-order term in the expansion of lunar elliptic effects. |
+| **μ2** | 12.87h | Variational | The Moon's orbital speed varies due to solar perturbation. Faster near new/full moon, slower at quarters. |
+| **ν2** | 12.63h | Larger lunar evectional | Evection: the Sun perturbs the Moon's orbit, causing a ~31.8-day oscillation in orbital eccentricity. |
+| **λ2** | 12.22h | Smaller lunar evectional | A secondary term arising from the same evection perturbation as ν2. |
+| **2SM2** | 11.61h | Shallow water | Compound tide from nonlinear interaction of S2 and M2 in shallow water. |
+| **MNS2** | 13.13h | Shallow water | Compound tide generated by nonlinear interactions in shallow coastal waters. |
+| **2MS2** | 13.39h | Shallow water | Another shallow-water compound tide from M2 and S2 interaction. |
+
+### Diurnal Constituents (~24 hours)
+
+These arise because the Moon and Sun are usually not directly over the equator, creating asymmetry between the two daily tidal bulges.
+
+| Name | Period | Description | Physical Mechanism |
+|------|--------|-------------|-------------------|
+| **K1** | 23.93h | Lunisolar diurnal | The largest diurnal constituent. When the Moon or Sun is north or south of the equator, the two daily high tides have different heights. |
+| **O1** | 25.82h | Principal lunar diurnal | The Moon's declination varies over ~27.3 days as it orbits. This creates a once-daily modulation of the tide. |
+| **P1** | 24.07h | Principal solar diurnal | The Sun's declination varies over the year (±23.4°). This creates a once-daily solar tide component. |
+| **Q1** | 26.87h | Larger lunar elliptic diurnal | The diurnal equivalent of N2. Modulation of O1 by the Moon's orbital eccentricity. |
+| **J1** | 23.10h | Smaller lunar elliptic diurnal | Smaller elliptic perturbation of the diurnal tide. |
+| **M1** | 24.84h | Smaller lunar diurnal | A secondary lunar diurnal term from the geometry of the Moon's orbit. |
+| **OO1** | 22.31h | Lunar diurnal second order | Second-order term in the lunar diurnal expansion. |
+| **ρ1** | 26.72h | Larger lunar evectional diurnal | Evection effect on the diurnal tide. |
+| **σ1** | 27.85h | Lunar diurnal | Related to the regression of the Moon's orbital nodes. |
+| **2Q1** | 28.01h | Larger elliptic second order | Second-order lunar elliptic effect on diurnal tide. |
+
+### Long-Period Constituents (days to years)
+
+These are low-frequency oscillations caused by longer-term orbital variations.
+
+| Name | Period | Description | Physical Mechanism |
+|------|--------|-------------|-------------------|
+| **Mf** | 13.66 days | Lunar fortnightly | The beating between M2 and S2 creates the spring-neap cycle. When Moon and Sun align (new/full moon), their tidal forces add; at quarter moons, they partially cancel. |
+| **Ssa** | 182.6 days | Solar semi-annual | Earth's orbital eccentricity causes the Sun to be closest in January and farthest in July, creating a 6-month cycle. |
+| **Sa** | 365.25 days | Solar annual | Combination of gravitational effects and meteorological seasonality (temperature-driven density changes, river discharge, prevailing winds). |
+
+---
+
+*Data: NOAA CO-OPS, San Francisco station 9414290. 175,320 hourly observations from 2004-2023.*
