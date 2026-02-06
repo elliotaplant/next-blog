@@ -1,0 +1,56 @@
+---
+title: 'Poetry MCP: Teaching Claude to Count Syllables'
+date: '2025-02-06'
+tags: ['software', 'ai', 'mcp']
+summary: 'An MCP server that gives Claude real phonetic data so it can write poetry with correct meter and rhyme.'
+images: ['/static/images/profile.png']
+---
+
+LLMs are surprisingly bad at poetry. Not the creative part — Claude can come up with beautiful imagery and metaphors all day. The problem is the mechanical stuff: counting syllables, maintaining stress patterns, and especially rhyming. Ask Claude to write a sonnet in iambic pentameter and it'll confidently hand you lines with 9 or 12 syllables. Ask for a word that rhymes with "orange" and it might suggest "forage" without flinching.
+
+The issue is that language models work with tokens, not sounds. They don't actually hear the words they're writing.
+
+So I built a tool that gives Claude ears: [Poetry MCP Server](https://poetry-mcp-server.elliotplant.workers.dev/). You can check out the [source code on GitHub](https://github.com/elliotaplant/poetry-mcp-server).
+
+# What's MCP?
+
+[MCP](https://modelcontextprotocol.io/) (Model Context Protocol) is a standard that lets you give Claude access to external tools. Instead of relying on what's baked into the model, you can connect it to real data sources and APIs. Claude can then decide when to call those tools while working on a task.
+
+In this case, the tools give Claude access to real phonetic data so it can verify its own work instead of guessing.
+
+# The Three Tools
+
+The server exposes three tools:
+
+**`analyze_poem`** — Takes a poem and a target meter (like iambic pentameter) and checks every line. It reports syllable counts, stress patterns, and rhyme scheme. This is the core feedback loop — Claude writes something, analyzes it, and sees exactly where the meter breaks.
+
+**`lookup_rhymes`** — Finds real rhymes for a given word using phonetic data. This is probably the most important tool. LLMs are notoriously bad at rhyming because they process text as tokens, not sounds. This tool returns words that actually rhyme, verified by their phonetic transcriptions.
+
+**`suggest_words`** — Finds words matching a specific stress pattern. Need a word with a da-DUM-da rhythm? This tool searches for words with that exact stress pattern. Super useful when you need to fill a gap in a metered line.
+
+# The CMU Pronouncing Dictionary
+
+All three tools are powered by the [CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict), a dataset of over 130,000 English words with their phonetic transcriptions. Each entry includes the word's phonemes and stress markers — exactly the data you need to count syllables, identify stress patterns, and find real rhymes.
+
+This is what makes the tool actually work. Instead of Claude guessing whether "wind" has one or two syllables (it depends on pronunciation!), it can look up the real phonetic data and give you an accurate answer.
+
+# The Workflow
+
+The typical workflow looks like this:
+
+1. **Write freely** — Let Claude draft a poem without worrying too much about perfection
+2. **Analyze** — Run `analyze_poem` to see where the meter breaks and which rhymes don't land
+3. **Fix** — Use `lookup_rhymes` and `suggest_words` to find replacements that actually fit
+4. **Re-analyze** — Check again until the meter is clean
+
+It turns writing metered poetry from a frustrating guessing game into an iterative process with real feedback.
+
+# Try It Out
+
+The Poetry MCP Server is a remote MCP server deployed on Cloudflare Workers, so you can connect it to Claude Desktop or claude.ai without installing anything locally. Head to the [landing page](https://poetry-mcp-server.elliotplant.workers.dev/) for setup instructions.
+
+There are also built-in MCP prompts for guided poem and song writing, so you can jump right in.
+
+# Built with Claude
+
+This whole thing was built by me and Claude in about a day, which is a fun bit of meta: using AI to build a tool that makes AI better at poetry. Claude wrote most of the code, and now Claude uses the tool to write better poems. The circle of life, or something.
